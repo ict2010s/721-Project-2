@@ -1,0 +1,71 @@
+---
+title: "Project2"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = FALSE,
+	message = FALSE,
+	warning = FALSE
+)
+
+library(tidyverse)
+```
+
+```{r}
+# The function is set up for cleaning daily air pollution data from a CSV file.
+# Arguments:
+#  filepath: Path to the input CSV file.
+#  o3_unit: Output unit for O3 ("ppm" or "ppb"); defaults to "ppm".
+# Returns:
+#  A cleaned tibble with one row per day and daily mean concentrations.
+
+clean <- function(filepath, o3_unit = "ppm") {
+  
+# Read in data
+  data <- read.csv(filepath)
+  
+# Rename the pollutant concentration columns
+  data <- data |> 
+    rename(
+       CO_max = Daily.Max.8.hour.CO.Concentration,
+      PM25_mean = Daily.Mean.PM2.5.Concentration,
+      O3_max = Daily.Max.8.hour.Ozone.Concentration
+    ) |> 
+# Format the date variable
+    mutate(Date = mdy(Date)) |> 
+# Remove duplicated rows
+    distinct()
+  
+# Set any measured concentration that is negative to zero
+concentrations <- c("CO_max", "PM25_mean", "O3_max")
+for (i in concentrations) {
+  data[, i] <- ifelse(data[, i] < 0, 0, data[, i])
+}
+  
+# Calculate the average concentration
+data <- data |> 
+  group_by(Date) |> 
+  mutate(
+    CO_max = mean(CO_max, na.rm = TRUE),
+    PM25_mean = mean(PM25_mean, na.rm = TRUE),
+    O3_max = mean(O3_max, na.rm = TRUE)
+  ) |> 
+  ungroup() |> 
+  distinct()
+
+# Convert O3 units if requested
+if (o3_unit == "ppb") {
+  data <- data |>
+    mutate(
+      O3_max = O3_max * 1000,
+      units_O3 = "ppb"
+    )
+}
+
+  return(data)
+}
+```
+
+
