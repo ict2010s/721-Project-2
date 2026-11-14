@@ -2,7 +2,7 @@
 title: "Air Pollution Trends at RDU Airport, 2018–2020"
 output: word_document
 ---
-
+**GitHub Repository:** [721-Project-2](https://github.com/ict2010s/721-Project-2)
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
 	echo = FALSE,
@@ -79,9 +79,15 @@ pollution_data <- bind_rows(
 ) |>
   arrange(Date)
 ```
+
+&nbsp;
+
+Note: CO and O3 concentrations represent daily maximum 8-hour measurements, while PM2.5 concentrations represent daily means. All summary statistics and monthly averages were calculated using these daily values.
+
 &nbsp;
 
 ## Tables
+
 &nbsp;
 ```{r table1, echo=FALSE}
 # Create tables
@@ -226,7 +232,7 @@ Lines were used to highlight monthly trends within each year, while points indic
 &nbsp;
 
 ## Interpretation
-Monthly mean CO concentrations were higher in late fall and winter, while O3 showed the opposite seasonal pattern, peaking in late spring and summer. PM2.5 showed considerable monthly and yearly variability without a consistent seasonal pattern. Regarding daily concentrations, CO and O3 had relatively similar minimum and maximum values across the three years, whereas PM2.5 reached a notably higher daily maximum in 2020 (31.2 µg/m³) compared with 2018 (20.4 µg/m³) and 2019 (21.3 µg/m³), despite 2020 data being limited to January through April.
+Monthly mean CO and O3 concentrations showed opposite seasonal patterns: CO was highest in winter when O3 was lowest, while O3 peaked around June when CO was near its minimum; as one increased, the other generally decreased. PM2.5 concentrations varied considerably across months and years without a clear, consistent seasonal pattern, although the limited January–April data for 2020 make seasonal comparisons less conclusive. Daily minimum and maximum concentrations of CO and O3 were generally comparable across years, whereas the maximum daily mean PM2.5 concentration was notably higher in 2020 (31.2 µg/m³) than in 2018 (20.4 µg/m³) and 2019 (21.3 µg/m³), despite the shorter observation period.
 
 &nbsp;
 
