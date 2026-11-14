@@ -14,7 +14,8 @@ The data were obtained from the U.S. Environmental Protection Agency (EPA) air q
 - `Project2.Rmd` — RMarkdown file containing the data cleaning function, analysis, tables, and plots.
 - `Project2.docx` — Final Word report generated from the RMarkdown file.
 - `data/` — Original CSV datasets for 2018, 2019, and 2020.
-- `.Rproj` — RStudio project configuration file.
+- `721-Project-2.Rproj` — RStudio project configuration file.
+- `.gitignore` — Specifies files and folders excluded from Git version control.
 - `README.md` — Project documentation.
 
 ## How to Reproduce
