@@ -80,7 +80,9 @@ pollution_data <- bind_rows(
   arrange(Date)
 ```
 
-```{r tables, echo=FALSE}
+
+## Tables
+```{r table1, echo=FALSE}
 # Create tables
 library(gt)
 pollutants <- c("CO_max", "PM25_mean", "O3_max")
@@ -92,9 +94,8 @@ table_2018 <- tibble(
 ) |>
   gt() |>
   fmt_number(columns = c(Minimum, Maximum), decimals = 3) |>
-  tab_header("Table 1. Minimum and maximum daily pollutant concentrations in 2018")
+  tab_header("Minimum and maximum daily pollutant concentrations in 2018")
 table_2018
-
 
 table_2019 <- tibble(
   Pollutant = c("CO (ppm)", "PM2.5 (ug/m3 LC)", "O3 (ppm)"),
@@ -103,20 +104,23 @@ table_2019 <- tibble(
 ) |>
   gt() |>
   fmt_number(columns = c(Minimum, Maximum), decimals = 3) |>
-  tab_header("Table 2. Minimum and maximum daily pollutant concentrations in 2019")
+  tab_header("Minimum and maximum daily pollutant concentrations in 2019")
 table_2019
 
 table_2020 <- tibble(
   Pollutant = c("CO (ppm)", "PM2.5 (ug/m3 LC)", "O3 (ppm)"),
-  Minimum = sapply(cleaned_2019[pollutants], min, na.rm = TRUE),
-  Maximum = sapply(cleaned_2019[pollutants], max, na.rm = TRUE)
+  Minimum = sapply(cleaned_2020[pollutants], min, na.rm = TRUE),
+  Maximum = sapply(cleaned_2020[pollutants], max, na.rm = TRUE)
 ) |>
   gt() |>
   fmt_number(columns = c(Minimum, Maximum), decimals = 3) |>
-  tab_header("Table 3. Minimum and maximum daily pollutant concentrations from January to April 2020")
+  tab_header("Minimum and maximum daily pollutant concentrations from January to April 2020")
 table_2020
 ```
 
+&nbsp;
+
+## Plots
 ```{r plot1}
 #  CO and O3 by month
 plot1_data <- pollution_data |>
@@ -145,7 +149,7 @@ plot1_data <- pollution_data |>
   )
 
 
-ggplot(monthly_data, aes(x = Month, y = Mean, color = Pollutant)) +
+ggplot(plot1_data, aes(x = Month, y = Mean, color = Pollutant)) +
   geom_point(size = 2) +
   geom_errorbar(aes(ymin = Lower, ymax = Upper), width = 0.2) +
   facet_wrap(~ Pollutant, scales = "free_y", ncol = 1) +
@@ -160,7 +164,11 @@ ggplot(monthly_data, aes(x = Month, y = Mean, color = Pollutant)) +
   theme_minimal() +
   theme(strip.text = element_blank())
 ```
+
+
 CO and O3 are displayed in separate panels with independent y-axis scales because their concentrations differ substantially in magnitude. This allows the monthly patterns and confidence intervals of both pollutants to be clearly visualized.
+
+&nbsp;
 
 ```{r plot2}
 plot2_data <- pollution_data |>
