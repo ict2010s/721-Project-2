@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 library(tidyverse)
 ```
 
-```{r}
+```{r function}
 # The function is set up for cleaning daily air pollution data from a CSV file.
 # Arguments:
 #  filepath: Path to the input CSV file.
@@ -39,8 +39,8 @@ clean <- function(filepath, o3_unit = "ppm") {
     distinct()
   
 # Set any measured concentration that is negative to zero
-concentrations <- c("CO_max", "PM25_mean", "O3_max")
-for (i in concentrations) {
+pollutants <- c("CO_max", "PM25_mean", "O3_max")
+for (i in pollutants) {
   data[, i] <- ifelse(data[, i] < 0, 0, data[, i])
 }
   
@@ -55,7 +55,7 @@ data <- data |>
   ungroup() |> 
   distinct()
 
-# Convert O3 units if requested
+# Convertible O3 units
 if (o3_unit == "ppb") {
   data <- data |>
     mutate(
@@ -66,6 +66,127 @@ if (o3_unit == "ppb") {
 
   return(data)
 }
+
+
+# Clean each year's data
+cleaned_2018 <- clean(here::here("data", "AQ_2018.csv"))
+cleaned_2019 <- clean(here::here("data", "AQ_2019.csv"))
+cleaned_2020 <- clean(here::here("data", "AQ_2020.csv"))
+
+# Combine to a single dataset
+pollution_data <- bind_rows(
+  cleaned_2018, cleaned_2019, cleaned_2020
+) |>
+  arrange(Date)
 ```
 
+```{r tables, echo=FALSE}
+# Create tables
+library(gt)
+pollutants <- c("CO_max", "PM25_mean", "O3_max")
 
+table_2018 <- tibble(
+  Pollutant = c("CO (ppm)", "PM2.5 (ug/m3 LC)", "O3 (ppm)"),
+  Minimum = sapply(cleaned_2018[pollutants], min, na.rm = TRUE),
+  Maximum = sapply(cleaned_2018[pollutants], max, na.rm = TRUE)
+) |>
+  gt() |>
+  fmt_number(columns = c(Minimum, Maximum), decimals = 3) |>
+  tab_header("Table 1. Minimum and maximum daily pollutant concentrations in 2018")
+table_2018
+
+
+table_2019 <- tibble(
+  Pollutant = c("CO (ppm)", "PM2.5 (ug/m3 LC)", "O3 (ppm)"),
+  Minimum = sapply(cleaned_2019[pollutants], min, na.rm = TRUE),
+  Maximum = sapply(cleaned_2019[pollutants], max, na.rm = TRUE)
+) |>
+  gt() |>
+  fmt_number(columns = c(Minimum, Maximum), decimals = 3) |>
+  tab_header("Table 2. Minimum and maximum daily pollutant concentrations in 2019")
+table_2019
+
+table_2020 <- tibble(
+  Pollutant = c("CO (ppm)", "PM2.5 (ug/m3 LC)", "O3 (ppm)"),
+  Minimum = sapply(cleaned_2019[pollutants], min, na.rm = TRUE),
+  Maximum = sapply(cleaned_2019[pollutants], max, na.rm = TRUE)
+) |>
+  gt() |>
+  fmt_number(columns = c(Minimum, Maximum), decimals = 3) |>
+  tab_header("Table 3. Minimum and maximum daily pollutant concentrations from January to April 2020")
+table_2020
+```
+
+```{r plot1}
+#  CO and O3 by month
+plot1_data <- pollution_data |>
+  mutate(
+  Month = factor(
+    month(Date),
+    levels = 1:12,
+    labels = month.abb
+  )
+) |> 
+  pivot_longer(
+    cols = c(CO_max, O3_max),
+    names_to = "Pollutant",
+    values_to = "Concentration"
+  ) |>
+  group_by(Month, Pollutant) |>
+  summarise(
+    Mean = mean(Concentration, na.rm = TRUE),
+    SD = sd(Concentration, na.rm = TRUE),
+    n = sum(!is.na(Concentration)),
+    .groups = "drop"
+  ) |>
+  mutate(
+    Lower = Mean - 1.96 * SD / sqrt(n),
+    Upper = Mean + 1.96 * SD / sqrt(n)
+  )
+
+
+ggplot(monthly_data, aes(x = Month, y = Mean, color = Pollutant)) +
+  geom_point(size = 2) +
+  geom_errorbar(aes(ymin = Lower, ymax = Upper), width = 0.2) +
+  facet_wrap(~ Pollutant, scales = "free_y", ncol = 1) +
+  scale_color_manual(values = c("CO_max" = "#555555", "O3_max" = "darkviolet"),
+                     labels = c("CO_max" = "CO", "O3_max" = "O3")
+  ) +
+  labs(
+    title = "Monthly Mean CO and O3 Concentrations",
+    x = "Month",
+    y = "Mean Concentration (ppm)"
+  ) +
+  theme_minimal() +
+  theme(strip.text = element_blank())
+```
+CO and O3 are displayed in separate panels with independent y-axis scales because their concentrations differ substantially in magnitude. This allows the monthly patterns and confidence intervals of both pollutants to be clearly visualized.
+
+```{r plot2}
+plot2_data <- pollution_data |>
+  mutate(
+    Month = factor(
+    month(Date),
+    levels = 1:12,
+    labels = month.abb
+  ),
+    Year = factor(year(Date))
+  ) |>
+  group_by(Year, Month) |>
+  summarise(
+    Mean = mean(PM25_mean, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+ggplot(plot2_data, aes(x = Month, y = Mean, color = Year, group = Year)) +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 2) +
+  scale_color_brewer(palette = "Set2") +
+  labs(
+    title = "Monthly Mean PM2.5 Concentrations by Year",
+    x = "Month",
+    y = "Mean PM2.5 Concentration (µg/m³)",
+    color = "Year"
+  ) +
+  theme_minimal()
+```
