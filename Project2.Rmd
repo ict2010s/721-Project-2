@@ -230,4 +230,5 @@ Monthly mean CO concentrations were higher in late fall and winter, while O3 sho
 
 &nbsp;
 
+### AI use statement
 I used ChatGPT to help understand R functions, troubleshoot coding and formatting issues, and improve data visualization. I reviewed the suggested syntax, checked the results against the assignment requirements, and made sure that the tables and plots are readable and professional.
