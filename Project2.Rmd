@@ -247,7 +247,7 @@ Lines were used to highlight monthly trends within each year, while points indic
 &nbsp;
 
 ## Interpretation
-Monthly mean CO and O3 concentrations showed opposite seasonal patterns: CO was highest in winter when O3 was lowest, while O3 peaked around June when CO was near its minimum; as one increased, the other generally decreased. PM2.5 concentrations varied considerably across months and years without a clear, consistent seasonal pattern, although the limited January–April data for 2020 make seasonal comparisons less conclusive. Daily minimum and maximum concentrations of CO and O3 were generally comparable across years, whereas the maximum daily mean PM2.5 concentration was notably higher in 2020 (31.2 µg/m³) than in 2018 (20.4 µg/m³) and 2019 (21.3 µg/m³), despite the shorter observation period.
+Monthly mean CO concentrations were generally higher in late fall and winter and lower in late spring and summer, while O₃ concentrations tended to be higher in early to midsummer and lower in fall. PM2.5 concentrations varied considerably across months and years without a clear, consistent seasonal pattern, although the limited January–April data for 2020 make seasonal comparisons less conclusive. Daily minimum and maximum concentrations of CO and O₃ were generally comparable across years, whereas the maximum daily mean PM2.5 concentration was notably higher in 2020 (31.2 µg/m³) than in 2018 (20.4 µg/m³) and 2019 (21.3 µg/m³), despite the shorter observation period.
 
 &nbsp;
 
