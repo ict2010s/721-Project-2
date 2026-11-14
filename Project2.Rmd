@@ -1,5 +1,5 @@
 ---
-title: "Project2"
+title: "Air Pollution Trends at RDU Airport, 2018–2020"
 output: word_document
 ---
 
@@ -79,45 +79,54 @@ pollution_data <- bind_rows(
 ) |>
   arrange(Date)
 ```
+&nbsp;
 
-```{r tables, echo=FALSE}
+## Tables
+&nbsp;
+```{r table1, echo=FALSE}
 # Create tables
 library(gt)
 pollutants <- c("CO_max", "PM25_mean", "O3_max")
 
 table_2018 <- tibble(
-  Pollutant = c("CO (ppm)", "PM2.5 (ug/m3 LC)", "O3 (ppm)"),
+  Pollutant = c("CO (ppm)", "PM2.5 (µg/m³ LC)", "O3 (ppm)"),
   Minimum = sapply(cleaned_2018[pollutants], min, na.rm = TRUE),
   Maximum = sapply(cleaned_2018[pollutants], max, na.rm = TRUE)
 ) |>
   gt() |>
   fmt_number(columns = c(Minimum, Maximum), decimals = 3) |>
-  tab_header("Table 1. Minimum and maximum daily pollutant concentrations in 2018")
+  tab_header("Minimum and maximum daily pollutant concentrations in 2018")
 table_2018
-
-
+```
+&nbsp;
+```{r table2, echo =FALSE}
 table_2019 <- tibble(
-  Pollutant = c("CO (ppm)", "PM2.5 (ug/m3 LC)", "O3 (ppm)"),
+  Pollutant = c("CO (ppm)", "PM2.5 (µg/m³ LC)", "O3 (ppm)"),
   Minimum = sapply(cleaned_2019[pollutants], min, na.rm = TRUE),
   Maximum = sapply(cleaned_2019[pollutants], max, na.rm = TRUE)
 ) |>
   gt() |>
   fmt_number(columns = c(Minimum, Maximum), decimals = 3) |>
-  tab_header("Table 2. Minimum and maximum daily pollutant concentrations in 2019")
+  tab_header("Minimum and maximum daily pollutant concentrations in 2019")
 table_2019
-
+```
+&nbsp;
+```{r table3, echo=FALSE}
 table_2020 <- tibble(
-  Pollutant = c("CO (ppm)", "PM2.5 (ug/m3 LC)", "O3 (ppm)"),
-  Minimum = sapply(cleaned_2019[pollutants], min, na.rm = TRUE),
-  Maximum = sapply(cleaned_2019[pollutants], max, na.rm = TRUE)
+  Pollutant = c("CO (ppm)", "PM2.5 (µg/m³ LC)", "O3 (ppm)"),
+  Minimum = sapply(cleaned_2020[pollutants], min, na.rm = TRUE),
+  Maximum = sapply(cleaned_2020[pollutants], max, na.rm = TRUE)
 ) |>
   gt() |>
   fmt_number(columns = c(Minimum, Maximum), decimals = 3) |>
-  tab_header("Table 3. Minimum and maximum daily pollutant concentrations from January to April 2020")
+  tab_header("Minimum and maximum daily pollutant concentrations from January to April 2020")
 table_2020
 ```
 
-```{r plot1}
+&nbsp;
+
+## Plots
+```{r plot1, fig.width=6.5, fig.height=4.5, fig.align="center", fig.cap="Figure 1. Monthly mean CO and O3 concentrations with 95% confidence intervals."}
 #  CO and O3 by month
 plot1_data <- pollution_data |>
   mutate(
@@ -145,24 +154,36 @@ plot1_data <- pollution_data |>
   )
 
 
-ggplot(monthly_data, aes(x = Month, y = Mean, color = Pollutant)) +
-  geom_point(size = 2) +
+ggplot(plot1_data, aes(x = Month, y = Mean, color = Pollutant)) +
+  geom_point(size = 2.2) +
   geom_errorbar(aes(ymin = Lower, ymax = Upper), width = 0.2) +
   facet_wrap(~ Pollutant, scales = "free_y", ncol = 1) +
   scale_color_manual(values = c("CO_max" = "#555555", "O3_max" = "darkviolet"),
                      labels = c("CO_max" = "CO", "O3_max" = "O3")
   ) +
   labs(
-    title = "Monthly Mean CO and O3 Concentrations",
     x = "Month",
     y = "Mean Concentration (ppm)"
   ) +
-  theme_minimal() +
-  theme(strip.text = element_blank())
+  theme_classic() +
+  theme(strip.background = element_blank(),
+  strip.text = element_blank(),
+    panel.grid.major.y = element_line(
+    color = "grey90",
+    linewidth = 0.3,
+    axis.text = element_text(color = "black")
+  ),
+    legend.position = "right",
+  legend.title = element_blank()
+  )
 ```
+
+
 CO and O3 are displayed in separate panels with independent y-axis scales because their concentrations differ substantially in magnitude. This allows the monthly patterns and confidence intervals of both pollutants to be clearly visualized.
 
-```{r plot2}
+&nbsp;
+
+```{r plot2, fig.width=6.5, fig.height=4, fig.align="center", fig.cap="Figure 2. Monthly mean PM2.5 concentrations by year."}
 plot2_data <- pollution_data |>
   mutate(
     Month = factor(
@@ -180,13 +201,33 @@ plot2_data <- pollution_data |>
 
 ggplot(plot2_data, aes(x = Month, y = Mean, color = Year, group = Year)) +
   geom_line(linewidth = 0.8) +
-  geom_point(size = 2) +
-  scale_color_brewer(palette = "Set2") +
+  geom_point(size = 2.2) +
+  scale_color_brewer(palette = "Dark2") +
   labs(
-    title = "Monthly Mean PM2.5 Concentrations by Year",
     x = "Month",
     y = "Mean PM2.5 Concentration (µg/m³)",
     color = "Year"
   ) +
-  theme_minimal()
+  theme_classic() +
+  theme(
+  panel.grid.major.y = element_line(
+    color = "grey90",
+    linewidth = 0.3
+  ),
+  axis.text = element_text(color = "black"),
+  legend.position = "right",
+  legend.title = element_blank()
+)
 ```
+
+
+Lines were used to highlight monthly trends within each year, while points indicate the observed monthly mean concentrations.
+
+&nbsp;
+
+## Interpretation
+Monthly mean CO concentrations were higher in late fall and winter, while O3 showed the opposite seasonal pattern, peaking in late spring and summer. PM2.5 showed considerable monthly and yearly variability without a consistent seasonal pattern. Regarding daily concentrations, CO and O3 had relatively similar minimum and maximum values across the three years, whereas PM2.5 reached a notably higher daily maximum in 2020 (31.2 µg/m³) compared with 2018 (20.4 µg/m³) and 2019 (21.3 µg/m³), despite 2020 data being limited to January through April.
+
+&nbsp;
+
+I used ChatGPT to help understand R functions, troubleshoot coding and formatting issues, and improve data visualization. I reviewed the suggested syntax, checked the results against the assignment requirements, and made sure that the tables and plots are readable and professional.
