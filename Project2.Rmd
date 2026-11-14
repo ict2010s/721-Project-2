@@ -90,15 +90,18 @@ Note: CO and O3 concentrations represent daily maximum 8-hour measurements, whil
 
 &nbsp;
 ```{r table1, echo=FALSE}
-# Create tables
+# Create a summary table of daily pollutant concentrations for 2018
+
 library(gt)
 pollutants <- c("CO_max", "PM25_mean", "O3_max")
 
+# Calculate the minimum and maximum daily concentrations for each pollutant
 table_2018 <- tibble(
   Pollutant = c("CO (ppm)", "PM2.5 (µg/m³ LC)", "O3 (ppm)"),
   Minimum = sapply(cleaned_2018[pollutants], min, na.rm = TRUE),
   Maximum = sapply(cleaned_2018[pollutants], max, na.rm = TRUE)
-) |>
+) |> 
+# Format values to three decimal places and add a table title
   gt() |>
   fmt_number(columns = c(Minimum, Maximum), decimals = 3) |>
   tab_header("Minimum and maximum daily pollutant concentrations in 2018")
@@ -106,6 +109,8 @@ table_2018
 ```
 &nbsp;
 ```{r table2, echo =FALSE}
+# Repeat the same summary procedure for 2019
+
 table_2019 <- tibble(
   Pollutant = c("CO (ppm)", "PM2.5 (µg/m³ LC)", "O3 (ppm)"),
   Minimum = sapply(cleaned_2019[pollutants], min, na.rm = TRUE),
@@ -118,6 +123,8 @@ table_2019
 ```
 &nbsp;
 ```{r table3, echo=FALSE}
+# Repeat the same summary procedure for 2020 (January–April)
+
 table_2020 <- tibble(
   Pollutant = c("CO (ppm)", "PM2.5 (µg/m³ LC)", "O3 (ppm)"),
   Minimum = sapply(cleaned_2020[pollutants], min, na.rm = TRUE),
@@ -133,7 +140,7 @@ table_2020
 
 ## Plots
 ```{r plot1, fig.width=6.5, fig.height=4.5, fig.align="center", fig.cap="Figure 1. Monthly mean CO and O3 concentrations with 95% confidence intervals."}
-#  CO and O3 by month
+# Calculate monthly mean concentrations and 95% CIs for CO and O3
 plot1_data <- pollution_data |>
   mutate(
   Month = factor(
@@ -142,11 +149,13 @@ plot1_data <- pollution_data |>
     labels = month.abb
   )
 ) |> 
+# Reshape data to analyze both pollutants together
   pivot_longer(
     cols = c(CO_max, O3_max),
     names_to = "Pollutant",
     values_to = "Concentration"
   ) |>
+# Pool daily observations from all years by month and pollutant
   group_by(Month, Pollutant) |>
   summarise(
     Mean = mean(Concentration, na.rm = TRUE),
@@ -154,12 +163,13 @@ plot1_data <- pollution_data |>
     n = sum(!is.na(Concentration)),
     .groups = "drop"
   ) |>
+# Calculate 95% CIs using the number of non-missing days
   mutate(
     Lower = Mean - 1.96 * SD / sqrt(n),
     Upper = Mean + 1.96 * SD / sqrt(n)
   )
 
-
+# Plot monthly means with 95% CI error bars
 ggplot(plot1_data, aes(x = Month, y = Mean, color = Pollutant)) +
   geom_point(size = 2.2) +
   geom_errorbar(aes(ymin = Lower, ymax = Upper), width = 0.2) +
@@ -171,14 +181,15 @@ ggplot(plot1_data, aes(x = Month, y = Mean, color = Pollutant)) +
     x = "Month",
     y = "Mean Concentration (ppm)"
   ) +
+# Apply a clean theme with subtle horizontal gridlines
   theme_classic() +
   theme(strip.background = element_blank(),
   strip.text = element_blank(),
     panel.grid.major.y = element_line(
     color = "grey90",
     linewidth = 0.3,
-    axis.text = element_text(color = "black")
   ),
+    axis.text = element_text(color = "black"),
     legend.position = "right",
   legend.title = element_blank()
   )
@@ -190,6 +201,7 @@ CO and O3 are displayed in separate panels with independent y-axis scales becaus
 &nbsp;
 
 ```{r plot2, fig.width=6.5, fig.height=4, fig.align="center", fig.cap="Figure 2. Monthly mean PM2.5 concentrations by year."}
+# Calculate monthly mean PM2.5 concentrations for each year
 plot2_data <- pollution_data |>
   mutate(
     Month = factor(
@@ -199,12 +211,14 @@ plot2_data <- pollution_data |>
   ),
     Year = factor(year(Date))
   ) |>
+# Group observations by year and month
   group_by(Year, Month) |>
   summarise(
     Mean = mean(PM25_mean, na.rm = TRUE),
     .groups = "drop"
   )
 
+# Plot monthly trends in PM2.5 concentrations across years
 ggplot(plot2_data, aes(x = Month, y = Mean, color = Year, group = Year)) +
   geom_line(linewidth = 0.8) +
   geom_point(size = 2.2) +
@@ -214,6 +228,7 @@ ggplot(plot2_data, aes(x = Month, y = Mean, color = Year, group = Year)) +
     y = "Mean PM2.5 Concentration (µg/m³)",
     color = "Year"
   ) +
+# Apply consistent formatting with Plot 1
   theme_classic() +
   theme(
   panel.grid.major.y = element_line(
@@ -237,4 +252,4 @@ Monthly mean CO and O3 concentrations showed opposite seasonal patterns: CO was 
 &nbsp;
 
 ### AI use statement
-I used ChatGPT to help understand R functions, troubleshoot coding and formatting issues, and improve data visualization. I reviewed the suggested syntax, checked the results against the assignment requirements, and made sure that the tables and plots are readable and professional.
+I used ChatGPT to help understand R functions, troubleshoot coding and formatting issues, improve data visualization, and add commentary throughout the code. I reviewed the suggested syntax, checked the results against the assignment requirements, and made sure that the tables and plots are readable and professional.
